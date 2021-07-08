@@ -23,6 +23,9 @@ const (
 	// LevelError should be used when someone should really look at the error.
 	LevelError
 
+	// LevelWarn should be used when some logic on failure.
+	LevelWarn
+
 	// LevelInfo should be used during normal operations.
 	LevelInfo
 
@@ -36,6 +39,8 @@ func (l LogLevel) String() string {
 		return "DEBUG"
 	case LevelInfo:
 		return "INFO"
+	case LevelWarn:
+		return "WARN"
 	case LevelError:
 		return "ERROR"
 	case LevelFatal:
@@ -56,6 +61,11 @@ func EnableDebug() {
 	logging(LevelInfo, "Debug mode enabled")
 }
 
+// SetLogLevel set the log level
+func SetLogLevel(l LogLevel) {
+	logLevel = l
+}
+
 // Debug sends a debug log message.
 func Debug(format string, v ...interface{}) {
 	if logLevel >= LevelDebug {
@@ -67,6 +77,13 @@ func Debug(format string, v ...interface{}) {
 func Info(format string, v ...interface{}) {
 	if logLevel >= LevelInfo {
 		logging(LevelInfo, format, v...)
+	}
+}
+
+// Warn sends a warn log message.
+func Warn(format string, v ...interface{}) {
+	if logLevel >= LevelWarn {
+		logging(LevelWarn, format, v...)
 	}
 }
 
