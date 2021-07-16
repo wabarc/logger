@@ -7,6 +7,8 @@ package logger // import "github.com/wabarc/logger"
 import (
 	"fmt"
 	"os"
+	"runtime"
+	"strings"
 	"time"
 )
 
@@ -111,5 +113,13 @@ func logging(l LogLevel, format string, v ...interface{}) {
 		prefix = fmt.Sprintf("[%s] ", l)
 	}
 
-	fmt.Fprintf(os.Stderr, prefix+format+"\n", v...)
+	pc, file, line, _ := runtime.Caller(2)
+	files := strings.Split(file, "/")
+	file = files[len(files)-1]
+	name := runtime.FuncForPC(pc).Name()
+	fns := strings.Split(name, ".")
+	name = fns[len(fns)-1]
+	caller := fmt.Sprintf("[%s:%d:%s] ", file, line, name)
+
+	fmt.Fprintf(os.Stderr, prefix+caller+format+"\n", v...)
 }
