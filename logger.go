@@ -10,6 +10,8 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/fatih/color"
 )
 
 var logLevel = LevelInfo
@@ -34,6 +36,14 @@ const (
 	// LevelDebug should be used only during development.
 	LevelDebug
 )
+
+var colorable = map[LogLevel]string{
+	LevelFatal: color.RedString("%s",LevelFatal),
+	LevelError: color.HiRedString("%s",LevelError),
+	LevelWarn:  color.YellowString("%s", LevelWarn),
+	LevelInfo:  color.BlueString("%s", LevelInfo),
+	LevelDebug: color.WhiteString("%s", LevelDebug),
+}
 
 func (l LogLevel) String() string {
 	switch l {
@@ -108,9 +118,9 @@ func logging(l LogLevel, format string, v ...interface{}) {
 	var prefix string
 
 	if showTime {
-		prefix = fmt.Sprintf("[%s] [%s] ", time.Now().Format("2006-01-02T15:04:05"), l)
+		prefix = fmt.Sprintf("[%s] [%s] ", color.CyanString(time.Now().Format("2006-01-02T15:04:05")), colorable[l])
 	} else {
-		prefix = fmt.Sprintf("[%s] ", l)
+		prefix = fmt.Sprintf("[%s] ", colorable[l])
 	}
 
 	pc, file, line, _ := runtime.Caller(2)
@@ -119,7 +129,7 @@ func logging(l LogLevel, format string, v ...interface{}) {
 	name := runtime.FuncForPC(pc).Name()
 	fns := strings.Split(name, ".")
 	name = fns[len(fns)-1]
-	caller := fmt.Sprintf("[%s:%d:%s] ", file, line, name)
+	caller := fmt.Sprintf("[%s:%d:%s] ", color.MagentaString("%s", file), line, color.MagentaString("%s", name))
 
 	fmt.Fprintf(os.Stderr, prefix+caller+format+"\n", v...)
 }
